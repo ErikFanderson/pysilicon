@@ -1,0 +1,24 @@
+{% extends "base.yml" %}
+{% block description %}YAML config for RTL simulation of module "{{top_module}}"{% endblock %}
+{% block content %}
+# Name of submodule
+name: {{top_module}} 
+
+# Name of testbench
+testbench: {{top_module}}_tb 
+
+# Select sublist of global filelist as dependencies
+filelist:
+  defines_src:
+  rtl_src:
+  test_src:
+
+# Simulation flags
+sim_flags:
+  #- +access+r
+  #- -define "NCVLOG"
+  #- -define "BEHAVIORAL"
+  #- -allowredefinition
+  #- -define "EXPERIMENT=\"$(experiment).v\""
+  #- -NOPORTERR \"?*\"
+{% endblock %}

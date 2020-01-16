@@ -1,0 +1,8 @@
+.doit*
+__pycache__
+*.swp
+*.vcd
+*.log
+*.history
+xcelium.d/
+build

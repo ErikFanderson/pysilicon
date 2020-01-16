@@ -1,0 +1,28 @@
+{% extends "base.yml" %}
+{% block description %}YAML config for post-PAR simulation of module "{{top_module}}"{% endblock %}
+{% block content %}
+# Name of submodule
+name: {{top_module}}
+
+# Name of testbench
+testbench: {{top_module}}_tb
+
+# Select sublist of global filelist as dependencies
+filelist:
+  defines_src:
+  rtl_src:
+  test_src:
+
+# Synthesized or PAR files that should be used in simulation (give rel path)
+syn_par_filelist:
+  #- build/par/test_module_0/current/test_module_0.placed.v 
+
+# Simulation flags
+sim_flags:
+  #- +access+r
+  #- -define "NCVLOG"
+  #- -define "BEHAVIORAL"
+  #- -allowredefinition
+  #- -define "EXPERIMENT=\"$(experiment).v\""
+  #- -NOPORTERR \"?*\"
+{% endblock %}

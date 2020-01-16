@@ -1,0 +1,7 @@
+defines_src:
+rtl_src:
+  - src/hdl/test/test_module_0.v
+  - src/hdl/test/test_module_1.v
+test_src:
+  - src/hdl/test/test_module_0_tb.v
+  - src/hdl/test/test_module_1_tb.v

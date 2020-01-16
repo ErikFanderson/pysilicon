@@ -1,0 +1,29 @@
+{% extends "base.yml" %}
+{% block description %}YAML config for synthesis of module "{{top_module}}"{% endblock %}
+{% block content %}
+# Name of syn task 
+name: {{top_module}} 
+
+# Name of top module 
+top: {{top_module}} 
+
+
+# Rel path to syn tcl template 
+tcl_template: templates/syn.tcl
+
+# Select sublist of global filelist as dependencies
+filelist:
+  defines_src:
+  rtl_src:
+  test_src:
+
+# Flags passed to synthesis tool 
+syn_flags:
+  - -batch
+
+# Timing libs to be used  (min, max, or typ)
+libs: 'max'
+
+# Rel path to timing constraints file 
+sdc: {{mod_dir}}/timing.sdc 
+{% endblock %}
