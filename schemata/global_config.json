@@ -1,0 +1,61 @@
+{
+"type": "object",
+"properties": {
+    "project_name": {
+        "type": "string"
+    },
+    "scratch_dir": {
+        "type": "string"
+    },
+    "task_dirs": {
+        "type": ["array"],
+        "items": {
+            "type": "string"
+        },
+        "unique_items": true 
+    },
+    "std_cell_rtl": {
+        "type": ["array","null"],
+        "items": {
+            "type": "string"
+        },
+        "unique_items": true 
+    },
+    "libs_max": {
+        "type": ["array","null"],
+        "items": {
+            "type": "string"
+        },
+        "unique_items": true 
+    },
+    "libs_min": {
+        "type": ["array","null"],
+        "items": {
+            "type": "string"
+        },
+        "unique_items": true 
+    },
+    "libs_typ": {
+        "type": ["array","null"],
+        "items": {
+            "type": "string"
+        },
+        "unique_items": true 
+    },
+    "lefs": {
+        "type": ["array","null"],
+        "items": {
+            "type": "string"
+        },
+        "unique_items": true 
+    },
+    "cap_table_file": {
+        "type": ["string","null"]
+    },
+    "qrc_tech_file": {
+        "type": ["string","null"]
+    }
+},
+"required": ["project_name","scratch_dir","task_dirs","std_cell_rtl","libs_max","libs_min",
+    "libs_typ","lefs","cap_table_file","qrc_tech_file"]
+}

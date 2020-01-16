@@ -1,0 +1,56 @@
+{
+"type": "object",
+"properties": {
+    "name": {
+        "type": "string"
+    },
+    "top": {
+        "type": "string"
+    },
+    "tcl_template": {
+        "type": "string"
+    },
+    "libs": {
+        "type": "string",
+        "enum": ["min","max","typ"]
+    },
+    "sdc": {
+        "type": "string"
+    },
+    "filelist": {
+        "type": "object",
+        "properties": {
+            "defines_src": {
+                "type": ["array","null"],
+                "items": {
+                    "type": "string"
+                },
+                "unique_items": true 
+            },
+            "rtl_src": {
+                "type": ["array","null"],
+                "items": {
+                    "type": "string"
+                },
+                "unique_items": true 
+            },
+            "test_src": {
+                "type": ["array","null"],
+                "items": {
+                    "type": "string"
+                },
+                "unique_items": true 
+            }
+        },
+        "required": ["defines_src","rtl_src","test_src"]
+    },
+    "syn_flags": {
+        "type": ["array","null"],
+        "items": {
+            "type": "string"
+        },
+        "unique_items": true 
+    }
+},
+"required": ["name","top","tcl_template","filelist","syn_flags","libs","sdc"]
+}

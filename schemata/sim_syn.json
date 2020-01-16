@@ -1,0 +1,54 @@
+{
+"type": "object",
+"properties": {
+    "name": {
+        "type": "string"
+    },
+    "testbench": {
+        "type": "string"
+    },
+    "filelist": {
+        "type": "object",
+        "properties": {
+            "defines_src": {
+                "type": ["array","null"],
+                "items": {
+                    "type": "string"
+                },
+                "unique_items": true 
+            },
+            "rtl_src": {
+                "type": ["array","null"],
+                "items": {
+                    "type": "string"
+                },
+                "unique_items": true 
+            },
+            "test_src": {
+                "type": ["array","null"],
+                "items": {
+                    "type": "string"
+                },
+                "unique_items": true 
+            }
+        },
+        "required": ["defines_src","rtl_src","test_src"]
+    },
+    "syn_par_filelist": {
+        "type": ["array","null"],
+        "items": {
+            "type": "string"
+        },
+        "unique_items": true 
+    },
+    "sim_flags": {
+        "type": ["array","null"],
+        "items": {
+            "type": "string"
+        },
+        "unique_items": true 
+    }
+},
+"required": ["name","testbench","filelist","syn_par_filelist",
+    "sim_flags"]
+}

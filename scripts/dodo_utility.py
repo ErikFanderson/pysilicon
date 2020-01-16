@@ -1,5 +1,5 @@
 from pathlib import Path
-import yaml
+import yaml,json
 import getpass 
 from datetime import datetime
 from jinja2 import Template, Environment, BaseLoader, FileSystemLoader
@@ -10,15 +10,17 @@ import jsonschema
 class PySilicon:
     
     def __init__(self,filelist_fname,config_fname):
+        filelist_fname = Path(filelist_fname)
+        config_fname = Path(config_fname)
         self.logger = self.create_logger(name='pysilicon',log_fname='dodo.log')
         # Working directory
         self.wd = Path('.').resolve()
+        # Read schemas
+        self.schemata = self.get_schemata()
         # Open filelist and create lists and strings 
-        with open(filelist_fname,'r') as fp:
-            self.filelist = yaml.load(fp,Loader=yaml.SafeLoader)
+        self.filelist = self.validate_yaml(filelist_fname,self.schemata[filelist_fname.stem])
         # Open global config 
-        with open(config_fname,'r') as fp:
-            self.config = yaml.load(fp,Loader=yaml.SafeLoader)
+        self.config = self.validate_yaml(config_fname,self.schemata[config_fname.stem])
         # Check and resolve all source files
         self.filelist = {
             'defines_src':self.check_and_resolve(self.filelist['defines_src']),
@@ -38,6 +40,27 @@ class PySilicon:
         # Check and resolve search directories
         self.task_dirs = self.check_and_resolve(self.config['task_dirs'],True)
         self.error_if_empty(self.task_dirs,"No task directories found")
+
+    def validate_yaml(self,yaml_fname,schema):
+        ''' loads and validates yaml using schema dict '''
+        with open(yaml_fname,'r') as fp:
+            loaded_yaml = yaml.load(fp,Loader=yaml.SafeLoader)
+        try:
+            jsonschema.validate(instance=loaded_yaml,schema=schema)
+        except jsonschema.exceptions.ValidationError as err:
+            self.logger.error(err)
+            self.error_if_empty(lst=[],
+                msg=f'YAML file {Path(yaml_fname).resolve()} does not conform to schema')
+        return loaded_yaml 
+
+    def get_schemata(self):
+        ''' returns dictionary with filename as key and yaml string as value '''
+        schemata = {} 
+        for f in (self.wd / 'schemata').glob('*.json'):
+            if f.is_file():
+                with open(f,'r') as fp:
+                    schemata[f.stem] = json.loads(fp.read())
+        return schemata
 
     def error_if_empty(self,lst,msg):
         ''' errors out and prints msg if list lst is empty '''

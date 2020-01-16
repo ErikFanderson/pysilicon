@@ -6,6 +6,7 @@
 # 5. par => par.yml
 
 # TODO
+# 0. Only have the tasks be validated once!
 # 1. Replace current tests with simple ALU test
 # 2. Need to finish synthesis tcl stuff (sdc, write for innovus etc...)!
 #       a. Need to verify that PLE works    
@@ -40,8 +41,7 @@ def task_syn():
     fnames = ps.find_tasks(['syn.yml'])
     # Generate tasks
     for f in fnames:
-        with open(f,'r') as fp:
-            config = yaml.load(fp,Loader=yaml.SafeLoader)
+        config = ps.validate_yaml(f,ps.schemata['syn'])
         filelist = ps.create_new_filelist(config['filelist'],test=False)
         config['hdl_files'] = ps.create_filelist_from_dict(filelist,test=False) 
         yield {
@@ -61,8 +61,7 @@ def sim(sim_type):
     fnames = ps.find_tasks(['sim_'+sim_type+'.yml'])
     # Generate tasks
     for f in fnames:
-        with open(f,'r') as fp:
-            config = yaml.load(fp,Loader=yaml.SafeLoader)
+        config = ps.validate_yaml(f,ps.schemata['sim_'+sim_type])
         filelist = ps.create_new_filelist(config['filelist']) 
         config['hdl_files'] = ps.create_filelist_from_dict(filelist) 
         yield {
@@ -94,8 +93,7 @@ def clean_sim(sim_type):
     fnames = ps.find_tasks(['sim_'+sim_type+'.yml'])
     # Generate tasks
     for f in fnames:
-        with open(f,'r') as fp:
-            config = yaml.load(fp,Loader=yaml.SafeLoader)
+        config = ps.validate_yaml(f,ps.schemata['sim_'+sim_type])
         exp_dir = ps.return_scratch_path('sim_'+sim_type,config['name'])
         yield {
             'name': config['name'],
@@ -121,8 +119,7 @@ def task_clean_syn():
     fnames = ps.find_tasks(['syn.yml'])
     # Generate tasks
     for f in fnames:
-        with open(f,'r') as fp:
-            config = yaml.load(fp,Loader=yaml.SafeLoader)
+        config = ps.validate_yaml(f,ps.schemata['syn'])
         exp_dir = ps.return_scratch_path('syn',config['name'])
         yield {
             'name': config['name'],
