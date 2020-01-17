@@ -13,8 +13,11 @@ class PySilicon:
         filelist_fname = Path(filelist_fname)
         config_fname = Path(config_fname)
         self.logger = self.create_logger(name='pysilicon',log_fname='dodo.log')
-        # Working directory
+        # Working and home directory
         self.wd = Path('.').resolve()
+        self.home_dir = os.getenv('PYSILICON_HOME')
+        self.error_if_empty(self.home_dir,'PYSILICON_HOME variable not set')
+        self.home_dir = Path(self.home_dir)
         # Read schemas
         self.schemata = self.get_schemata()
         # Open filelist and create lists and strings 
@@ -56,7 +59,7 @@ class PySilicon:
     def get_schemata(self):
         ''' returns dictionary with filename as key and yaml string as value '''
         schemata = {} 
-        for f in (self.wd / 'schemata').glob('*.json'):
+        for f in (self.home_dir / 'schemata').glob('*.json'):
             if f.is_file():
                 with open(f,'r') as fp:
                     schemata[f.stem] = json.loads(fp.read())
