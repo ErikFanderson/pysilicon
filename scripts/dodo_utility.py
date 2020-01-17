@@ -66,7 +66,7 @@ class PySilicon:
         ''' errors out and prints msg if list lst is empty '''
         if not lst:
             self.logger.error(msg)
-            sys.exit()
+            sys.exit(-1)
 
     @staticmethod
     def create_logger(name,log_fname):
