@@ -6,3 +6,6 @@ if ( $?PYTHONPATH ) then
 else
     setenv PYTHONPATH ${PWD}
 endif
+
+# Set PYSILICON_HOME variable
+setenv PYSILICON_HOME ${PWD}
