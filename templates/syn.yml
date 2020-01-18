@@ -7,9 +7,8 @@ name: {{top_module}}
 # Name of top module 
 top: {{top_module}} 
 
-
-# Rel path to syn tcl template 
-tcl_template: templates/syn.tcl
+# Path to syn tcl template (relative to working dir or absolute path) 
+tcl_template: {{home_dir}}/templates/syn.tcl
 
 # Select sublist of global filelist as dependencies
 filelist:

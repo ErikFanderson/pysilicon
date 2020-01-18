@@ -301,7 +301,7 @@ class PySilicon:
         mod_dir.mkdir()
         # Render jinja templates
         self.jinja_render(self.home_dir/"templates/syn.yml",mod_dir/"syn.yml",
-            top_module=module_name,mod_dir=rel_mod_dir)
+            top_module=module_name,mod_dir=rel_mod_dir,home_dir=self.home_dir)
         self.jinja_render(self.home_dir / "templates/sim_rtl.yml",mod_dir / "sim_rtl.yml",
             top_module=module_name)
         self.jinja_render(self.home_dir / "templates/sim_syn.yml",mod_dir / "sim_syn.yml",
