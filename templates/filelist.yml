@@ -1,0 +1,11 @@
+{% extends "base.yml" %}
+{% block description %}Default global filelist{% endblock %}
+{% block content %}
+defines_src:
+rtl_src:
+  - {{home_dir}}/tests/test_module_0.v
+  - {{home_dir}}/tests/test_module_1.v
+test_src:
+  - {{home_dir}}/tests/test_module_0_tb.v
+  - {{home_dir}}/tests/test_module_1_tb.v
+{% endblock %}

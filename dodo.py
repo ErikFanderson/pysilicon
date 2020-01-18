@@ -30,7 +30,7 @@ DOIT_CONFIG = {
     'default_tasks': []
 }
 
-ps = PySilicon(filelist_fname='filelist.yml',config_fname='global_config.yml')
+ps = PySilicon()
 
 #----------------------------------------------------------
 # Synthesis Task 
@@ -141,6 +141,13 @@ def task_gen_mod():
     ''' Generates a new module directory w/ default sim, syn, and par config files '''
     return {
         'actions': [ps.gen_mod_action],
+        'verbosity': 2
+    }
+
+def task_gen_config():
+    ''' Generates a default global_config.yml and a default filelist.yml '''
+    return {
+        'actions': [(ps.gen_config_action,[True])],
         'verbosity': 2
     }
 

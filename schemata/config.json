@@ -8,7 +8,7 @@
         "type": "string"
     },
     "task_dirs": {
-        "type": ["array"],
+        "type": ["array","null"],
         "items": {
             "type": "string"
         },

@@ -1,0 +1,33 @@
+{% extends "base.yml" %}
+{% block description %}Global configuration file{% endblock %}
+{% block content %}
+# Project name
+project_name: chip 
+
+# The base scratch path that data, logs, etc... will be dumped to
+scratch_dir: /scratch/
+
+# Directories that will be searched for task yml files
+task_dirs:
+  #- path/to/task/dir
+
+# RTL files for the standard cells 
+std_cell_rtl:
+  #- path/to/std_cells/std_cell_rtl.v 
+
+# Timing Libs
+libs_max: 
+  #- path/to/libs/max.lib 
+libs_min: 
+  #- path/to/libs/min.lib 
+libs_typ: 
+  #- path/to/libs/typ.lib 
+
+# List of lefs (must specify LEFs to enable Physical Layout Estimation (PLE) synthesis flow)
+lefs:
+  #- path/to/lefs/file.lef 
+
+# Parasitics (qrc_tech_file takes precedence if both supplied)
+cap_table_file:
+qrc_tech_file:
+{% endblock %}

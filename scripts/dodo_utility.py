@@ -9,9 +9,7 @@ import jsonschema
 
 class PySilicon:
     
-    def __init__(self,filelist_fname,config_fname):
-        filelist_fname = Path(filelist_fname)
-        config_fname = Path(config_fname)
+    def __init__(self):
         self.logger = self.create_logger(name='pysilicon',log_fname='dodo.log')
         # Working and home directory
         self.wd = Path('.').resolve()
@@ -20,10 +18,12 @@ class PySilicon:
         self.home_dir = Path(self.home_dir)
         # Read schemas
         self.schemata = self.get_schemata()
+        # Generates filelist and config if they don't already exist
+        self.gen_config_action()
         # Open filelist and create lists and strings 
-        self.filelist = self.validate_yaml(filelist_fname,self.schemata[filelist_fname.stem])
+        self.filelist = self.validate_yaml('filelist.yml',self.schemata['filelist'])
         # Open global config 
-        self.config = self.validate_yaml(config_fname,self.schemata[config_fname.stem])
+        self.config = self.validate_yaml('config.yml',self.schemata['config'])
         # Check and resolve all source files
         self.filelist = {
             'defines_src':self.check_and_resolve(self.filelist['defines_src']),
@@ -42,7 +42,6 @@ class PySilicon:
         self.prj_scratch_dir = self.scratch_base_dir / self.config['project_name'] / 'build'
         # Check and resolve search directories
         self.task_dirs = self.check_and_resolve(self.config['task_dirs'],True)
-        self.error_if_empty(self.task_dirs,"No task directories found")
 
     def validate_yaml(self,yaml_fname,schema):
         ''' loads and validates yaml using schema dict '''
@@ -286,7 +285,7 @@ class PySilicon:
         flags = self.strip_and_cat(config['syn_flags'])
         # CD into scratch dir and run simulation 
         self.shell(f'cp dodo.log {exp_dir}; cd {exp_dir}; genus {flags} -f {exp_dir / "syn.tcl"}')
-
+    
     def gen_mod_action(self):
         ''' action portion of gen_module task '''
         # Get module and directory names
@@ -311,3 +310,24 @@ class PySilicon:
         self.jinja_render(self.home_dir / "templates/timing.sdc",mod_dir / "timing.sdc",
             top_module=module_name)
         self.logger.info(f'Module "{module_name}" generated at "{mod_dir}"')
+
+    def gen_config_action(self,possible_to_overwrite=False):
+        ''' action portion of gen_config task '''
+        # Filelist
+        if (self.wd / 'filelist.yml').is_file():
+            if possible_to_overwrite:
+                response = input('filelist.yml exists in working directory. Replace?(Y/n)')
+                if response.lower() == 'y':
+                    self.jinja_render(self.home_dir/"templates/filelist.yml",
+                        self.wd/'filelist.yml',home_dir=self.home_dir)
+        else:
+            self.jinja_render(self.home_dir/"templates/filelist.yml",
+                        self.wd/'filelist.yml',home_dir=self.home_dir)
+        # Config 
+        if (self.wd / 'config.yml').is_file():
+            if possible_to_overwrite:
+                response = input('config.yml exists in working directory. Replace?(Y/n)')
+                if response.lower() == 'y':
+                    self.jinja_render(self.home_dir/"templates/config.yml",self.wd/'config.yml')
+        else:
+            self.jinja_render(self.home_dir/"templates/config.yml",self.wd/'config.yml')
