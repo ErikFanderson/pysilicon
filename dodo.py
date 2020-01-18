@@ -16,10 +16,9 @@
 #       f. "define optimization settings" 
 #       f. Understand how multiple libraries work together... Why use max or min?
 # 5. Add in support for the experiments test flow
-# 6. YAML schema 
 # 8. Add place and route tasks
 # 12. README!
-# 13. pytest (will want to have schemas setup before starting this...)
+# 13. pytest
 
 from scripts.dodo_utility import *
 
