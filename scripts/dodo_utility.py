@@ -224,7 +224,7 @@ class PySilicon:
     def jinja_render(self,template_path,output_file_path,**kwargs):
         ''' Loads template and outputs to file '''
         with open(template_path,'r') as fp:
-            fsl = FileSystemLoader(f"{self.wd / 'templates'}")
+            fsl = FileSystemLoader(f"{self.home_dir / 'templates'}")
             template = Environment(loader=fsl).from_string(fp.read())
         now = datetime.now()
         with open(output_file_path,'w') as fp:
@@ -300,14 +300,14 @@ class PySilicon:
         mod_dir = parent_path / module_name
         mod_dir.mkdir()
         # Render jinja templates
-        self.jinja_render(self.wd/"templates/syn.yml",mod_dir/"syn.yml",
+        self.jinja_render(self.home_dir/"templates/syn.yml",mod_dir/"syn.yml",
             top_module=module_name,mod_dir=rel_mod_dir)
-        self.jinja_render(self.wd / "templates/sim_rtl.yml",mod_dir / "sim_rtl.yml",
+        self.jinja_render(self.home_dir / "templates/sim_rtl.yml",mod_dir / "sim_rtl.yml",
             top_module=module_name)
-        self.jinja_render(self.wd / "templates/sim_syn.yml",mod_dir / "sim_syn.yml",
+        self.jinja_render(self.home_dir / "templates/sim_syn.yml",mod_dir / "sim_syn.yml",
             top_module=module_name)
-        self.jinja_render(self.wd / "templates/sim_par.yml",mod_dir / "sim_par.yml",
+        self.jinja_render(self.home_dir / "templates/sim_par.yml",mod_dir / "sim_par.yml",
             top_module=module_name)
-        self.jinja_render(self.wd / "templates/timing.sdc",mod_dir / "timing.sdc",
+        self.jinja_render(self.home_dir / "templates/timing.sdc",mod_dir / "timing.sdc",
             top_module=module_name)
         self.logger.info(f'Module "{module_name}" generated at "{mod_dir}"')
