@@ -2,7 +2,7 @@
 
 # Set PYTHONPATH accordingly
 if ( $?PYTHONPATH ) then
-    setenv PYTHONPATH ${PYTHONPATH}:${PWD}
+    setenv PYTHONPATH ${PWD}:${PYTHONPATH}
 else
     setenv PYTHONPATH ${PWD}
 endif
