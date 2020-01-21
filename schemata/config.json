@@ -57,5 +57,6 @@
     }
 },
 "required": ["project_name","scratch_dir","task_dirs","std_cell_rtl","libs_max","libs_min",
-    "libs_typ","lefs","cap_table_file","qrc_tech_file"]
+    "libs_typ","lefs","cap_table_file","qrc_tech_file"],
+"additionalProperties": false
 }

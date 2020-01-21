@@ -35,8 +35,6 @@ test_module_0 #(.WIDTH(WIDTH)) dut (
 // Example Simulation
 initial begin
     // $dumpfile(<filename>); $dumpvars(<levels>,<mod/var 0>,...,<mod/var N>);
-    $dumpfile("waves.vcd");
-    $dumpvars();
     rst_n = 1'b0;
     #(1);
     rst_n = 1'b1;

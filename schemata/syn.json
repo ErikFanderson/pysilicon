@@ -52,5 +52,6 @@
         "unique_items": true 
     }
 },
-"required": ["name","top","tcl_template","filelist","syn_flags","libs","sdc"]
+"required": ["name","top","tcl_template","filelist","syn_flags","libs","sdc"],
+"additionalProperties": false
 }

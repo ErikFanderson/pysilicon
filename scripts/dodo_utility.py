@@ -205,6 +205,15 @@ class PySilicon:
         ''' Checks list of files and then concatenates them into string '''
         return self.strip_and_cat(self.check_and_resolve(filelist))
     
+    def gen_sim_tcl(self,template_path,exp_dir,config):
+        ''' Generates sim.tcl from template '''
+        # Create syn.tcl
+        self.jinja_render(
+            template_path=template_path,
+            output_file_path=exp_dir / 'sim.tcl',
+            testbench=config['testbench']
+        )
+    
     def gen_syn_tcl(self,template_path,exp_dir,config):
         ''' Generates syn.tcl from template '''
         # Create syn.tcl
@@ -271,8 +280,12 @@ class PySilicon:
         except TypeError:
             flags = self.strip_and_cat(define_flags)
         tb = config['testbench']
+        try:
+            self.gen_sim_tcl(self.wd / config['tcl_template'],exp_dir,config)
+        except TypeError:
+            self.gen_sim_tcl(self.home_dir / "templates/sim_default.tcl",exp_dir,config)
         # CD into scratch dir and run simulation 
-        self.shell(f'cp dodo.log {exp_dir}; cd {exp_dir}; xrun {flags} {flist_str} -top {tb}')
+        self.shell(f'cp dodo.log {exp_dir}; cd {exp_dir}; xrun {flags} {flist_str} -top {tb} -input {exp_dir / "sim.tcl"}')
     
     def syn_action(self,config):
         ''' Action fn for synthesis '''
@@ -302,11 +315,11 @@ class PySilicon:
         self.jinja_render(self.home_dir/"templates/syn.yml",mod_dir/"syn.yml",
             top_module=module_name,mod_dir=rel_mod_dir,home_dir=self.home_dir)
         self.jinja_render(self.home_dir / "templates/sim_rtl.yml",mod_dir / "sim_rtl.yml",
-            top_module=module_name)
+            top_module=module_name,home_dir=self.home_dir)
         self.jinja_render(self.home_dir / "templates/sim_syn.yml",mod_dir / "sim_syn.yml",
-            top_module=module_name)
+            top_module=module_name,home_dir=self.home_dir)
         self.jinja_render(self.home_dir / "templates/sim_par.yml",mod_dir / "sim_par.yml",
-            top_module=module_name)
+            top_module=module_name,home_dir=self.home_dir)
         self.jinja_render(self.home_dir / "templates/timing.sdc",mod_dir / "timing.sdc",
             top_module=module_name)
         self.logger.info(f'Module "{module_name}" generated at "{mod_dir}"')

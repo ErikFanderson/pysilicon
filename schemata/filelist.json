@@ -23,5 +23,6 @@
         "unique_items": true 
     }
 },
-"required": ["defines_src","rtl_src","test_src"]
+"required": ["defines_src","rtl_src","test_src"],
+"additionalProperties": false
 }

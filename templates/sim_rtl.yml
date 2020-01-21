@@ -13,6 +13,11 @@ filelist:
   rtl_src:
   test_src:
 
+# Template for simulation tcl. Used for setting DB format and probe depth
+tcl_template:
+#tcl_template: {{home_dir}}/templates/sim_shm.tcl
+#tcl_template: {{home_dir}}/templates/sim_vcd.tcl
+
 # Simulation flags
 sim_flags:
   #- +access+r

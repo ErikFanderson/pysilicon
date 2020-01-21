@@ -7,6 +7,9 @@
     "testbench": {
         "type": "string"
     },
+    "tcl_template": {
+        "type": ["string","null"]
+    },
     "filelist": {
         "type": "object",
         "properties": {
@@ -42,5 +45,6 @@
         "unique_items": true 
     }
 },
-"required": ["name","testbench","filelist","sim_flags"]
+"required": ["name","testbench","tcl_template","filelist","sim_flags"],
+"additionalProperties": false 
 }

@@ -7,6 +7,9 @@
     "testbench": {
         "type": "string"
     },
+    "tcl_template": {
+        "type": ["string","null"]
+    },
     "filelist": {
         "type": "object",
         "properties": {
@@ -50,5 +53,6 @@
     }
 },
 "required": ["name","testbench","filelist","syn_par_filelist",
-    "sim_flags"]
+    "sim_flags","tcl_template"],
+"additionalProperties": false 
 }
