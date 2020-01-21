@@ -19,6 +19,7 @@
 # 8. Add place and route tasks
 # 12. README!
 # 13. pytest
+# 14. Need to make sure that SDC path in syn.yml is relative to working directory!
 
 from scripts.dodo_utility import *
 

@@ -15,8 +15,8 @@ filelist:
 
 # Template for simulation tcl. Used for setting DB format and probe depth
 tcl_template:
-#tcl_template: {{home_dir}}/templates/sim_shm.tcl
-#tcl_template: {{home_dir}}/templates/sim_vcd.tcl
+#tcl_template: {{rel_home}}/templates/sim_shm.tcl
+#tcl_template: {{rel_home}}/templates/sim_vcd.tcl
 
 # Synthesized or PAR files that should be used in simulation (give rel path)
 syn_par_filelist:

@@ -16,6 +16,7 @@ class PySilicon:
         self.home_dir = os.getenv('PYSILICON_HOME')
         self.error_if_empty(self.home_dir,'PYSILICON_HOME variable not set')
         self.home_dir = Path(self.home_dir)
+        self.rel_home = self.home_dir.relative_to(self.wd)
         # Read schemas
         self.schemata = self.get_schemata()
         # Generates filelist and config if they don't already exist
@@ -280,6 +281,7 @@ class PySilicon:
         except TypeError:
             flags = self.strip_and_cat(define_flags)
         tb = config['testbench']
+        # Generate simulation TCL file
         try:
             self.gen_sim_tcl(self.wd / config['tcl_template'],exp_dir,config)
         except TypeError:
@@ -313,13 +315,13 @@ class PySilicon:
         mod_dir.mkdir()
         # Render jinja templates
         self.jinja_render(self.home_dir/"templates/syn.yml",mod_dir/"syn.yml",
-            top_module=module_name,mod_dir=rel_mod_dir,home_dir=self.home_dir)
+            top_module=module_name,mod_dir=rel_mod_dir,rel_home=self.rel_home)
         self.jinja_render(self.home_dir / "templates/sim_rtl.yml",mod_dir / "sim_rtl.yml",
-            top_module=module_name,home_dir=self.home_dir)
+            top_module=module_name,rel_home=self.rel_home)
         self.jinja_render(self.home_dir / "templates/sim_syn.yml",mod_dir / "sim_syn.yml",
-            top_module=module_name,home_dir=self.home_dir)
+            top_module=module_name,rel_home=self.rel_home)
         self.jinja_render(self.home_dir / "templates/sim_par.yml",mod_dir / "sim_par.yml",
-            top_module=module_name,home_dir=self.home_dir)
+            top_module=module_name,rel_home=self.rel_home)
         self.jinja_render(self.home_dir / "templates/timing.sdc",mod_dir / "timing.sdc",
             top_module=module_name)
         self.logger.info(f'Module "{module_name}" generated at "{mod_dir}"')
