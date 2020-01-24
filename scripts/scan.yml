@@ -1,0 +1,14 @@
+name: test_scan_chain 
+prefix: TSC 
+parameters:
+  x: 6
+  y: 7
+cells:
+  - name: test0
+    width: x
+    mult: y
+    R/W: R
+  - name: test1
+    width: x*y+3
+    mult: 1
+    R/W: W 
