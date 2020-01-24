@@ -10,3 +10,4 @@ dependencies:
   - pyyaml
   - jsonschema
   - pytest
+  - sympy 

@@ -145,6 +145,30 @@ class ScanGenerator:
             with open(self.config['name']+'_defines.v','w') as dfp:
                 self.gen_src(sfp,dfp)
 
+    def gen_src(self,sfp,dfp):
+        ''' generates the verilog source '''
+        # Populate cell
+        cw = 0 # current width
+        for cell in self.config['cells']:
+            cell['full_width'] = cell['width']*cell['mult'] 
+            cell['full_name'] = self.config['prefix']+'_'+cell['name'] 
+            cell['min_pos'] = cw 
+            cell['max_pos'] = cell['full_width']+cw-1
+            cw += cell['full_width']
+        # Sin and Sout
+        for i,cell in enumerate(self.config['cells']):
+            if i == 0:
+                cell['sin'] = 'SIn' 
+            else:
+                cell['sin'] = f"{self.config['cells'][i-1]['full_name']}_to_{cell['full_name']}" 
+            try:
+                cell['sout'] = f"{cell['full_name']}_to_{self.config['cells'][i+1]['full_name']}" 
+            except IndexError:
+                cell['sout'] = 'SOut' 
+        # Generate files 
+        self.write_src(sfp)
+        self.write_defines(dfp)
+
     def write_src(self,fp):
         ''' Writes src file '''
         fstr = '' 
@@ -230,21 +254,21 @@ class ScanGenerator:
         fstr += define(self.config['prefix']+'_TwoPhase',tp,tab='')
         fstr += define(self.config['prefix']+'_ConfigLatch',tp,tab='')
         fstr += end_section() 
-        # Section: defines total length 
+        # defines total length 
         fstr += begin_section("Total scan chain length") 
         fstr += define(self.config['prefix']+'_TotalLength',self.full_width,tab='')
         fstr += end_section() 
-        # Section: iterate through cells and define flattened widths 
+        # iterate through cells and define flattened widths 
         fstr += begin_section("Defines for flattened segment widths") 
         for cell in self.config['cells']:
             fstr += define(cell['full_name']+'_Width',cell['full_width'],tab='')
         fstr += end_section()
-        # Section: iterate through cells and define flattened vectors 
+        # iterate through cells and define flattened vectors 
         fstr += begin_section("Defines for flattened vector segments") 
         for cell in self.config['cells']:
             fstr += define(cell['full_name'],f"{cell['max_pos']}:{cell['min_pos']}",tab='')
         fstr += end_section()
-        # Section: iterate through cells and define mult functions 
+        # iterate through cells and define mult functions 
         fstr += begin_section("Defines for multi-vector segments") 
         for cell in self.config['cells']:
             name = cell['full_name'] + '_idx(n)'
@@ -252,30 +276,6 @@ class ScanGenerator:
             fstr += define(name,value,tab='')
         fstr += end_section()
         fp.write(fstr)
-
-    def gen_src(self,sfp,dfp):
-        ''' generates the verilog source '''
-        # Populate cell
-        cw = 0 # current width
-        for cell in self.config['cells']:
-            cell['full_width'] = cell['width']*cell['mult'] 
-            cell['full_name'] = self.config['prefix']+'_'+cell['name'] 
-            cell['min_pos'] = cw 
-            cell['max_pos'] = cell['full_width']+cw-1
-            cw += cell['full_width']
-        # Sin and Sout
-        for i,cell in enumerate(self.config['cells']):
-            if i == 0:
-                cell['sin'] = 'SIn' 
-            else:
-                cell['sin'] = f"{self.config['cells'][i-1]['full_name']}_to_{cell['full_name']}" 
-            try:
-                cell['sout'] = f"{cell['full_name']}_to_{self.config['cells'][i+1]['full_name']}" 
-            except IndexError:
-                cell['sout'] = 'SOut' 
-        # Generate files 
-        self.write_src(sfp)
-        self.write_defines(dfp)
    
 if __name__=='__main__':
     sg = ScanGenerator()
