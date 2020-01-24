@@ -3,6 +3,8 @@ prefix: TSC
 parameters:
   x: 6
   y: 7
+config_latch: true
+two_phase: true
 cells:
   - name: test0
     width: x
@@ -12,3 +14,11 @@ cells:
     width: x*y+3
     mult: 1
     R/W: W 
+  - name: test2
+    width: 1
+    mult: 1
+    R/W: W 
+  - name: test3
+    width: 16
+    mult: 1
+    R/W: R 
