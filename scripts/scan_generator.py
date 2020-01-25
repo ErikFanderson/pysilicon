@@ -5,6 +5,24 @@ from pathlib import Path
 import yaml
 from sympy.parsing.sympy_parser import parse_expr
 import copy
+import jsonschema
+import json
+   
+#----------------------------------------------------------
+# Utility functions 
+#----------------------------------------------------------
+def validate_yaml(yaml_fname,schema_fname):
+    ''' loads and validates yaml using schema dict '''
+    with open(schema_fname,'r') as fp:
+        loaded_schema = json.load(fp)
+    with open(yaml_fname,'r') as fp:
+        loaded_yaml = yaml.load(fp,Loader=yaml.SafeLoader)
+    try:
+        jsonschema.validate(instance=loaded_yaml,schema=loaded_schema)
+    except jsonschema.exceptions.ValidationError as err:
+        print(f'{err}\nYAML file {Path(yaml_fname).resolve()} does not conform to schema')
+        sys.exit(-1)
+    return loaded_yaml 
 
 #----------------------------------------------------------
 # Generic code gen functions 
@@ -112,6 +130,7 @@ class ScanGenerator:
         if self.home_dir is None:
             print('PYSILICON_HOME variable not set')
             sys.exit(-1)
+        self.home_dir = Path(self.home_dir)
         # Argparse check
         self.options = self.parse_args()
         if Path(self.options.config).is_file() is False:
@@ -142,8 +161,7 @@ class ScanGenerator:
     def gen_chain(self):
         ''' Generates all files for scan chain '''
         # Read Config
-        with open(self.options.config,'r') as fp:
-            self.config = yaml.load(fp,Loader=yaml.SafeLoader)
+        self.config = validate_yaml(self.options.config,str(self.home_dir/'schemata/scan.json'))
         self.og_config = copy.deepcopy(self.config)
         self.config = self.evaluate_cells(self.config)
         with open(self.config['name']+'.v','w') as sfp:

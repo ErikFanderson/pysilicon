@@ -62,7 +62,7 @@ class PySilicon:
         for f in (self.home_dir / 'schemata').glob('*.json'):
             if f.is_file():
                 with open(f,'r') as fp:
-                    schemata[f.stem] = json.loads(fp.read())
+                    schemata[f.stem] = json.load(fp)
         return schemata
 
     def error_if_empty(self,lst,msg):

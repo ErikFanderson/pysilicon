@@ -1,0 +1,26 @@
+{
+"type": "object",
+"properties": {
+    "name": { "type": "string" },
+    "prefix": { "type": "string" },
+    "config_latch": { "type": "boolean" },
+    "two_phase": { "type": "boolean" },
+    "parameters": { "type": ["object","null"] },
+    "cells": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "width": { "type": ["string","integer"] },
+            "mult": { "type": ["string","integer"] },
+            "R/W": { "type": "string","enum": ["R","W"] }
+          },
+          "required": ["name","width","mult","R/W"]
+        },
+        "unique_items": true 
+    }
+},
+"required": ["name","prefix","parameters","config_latch","two_phase","cells"],
+"additionalProperties": false 
+}
