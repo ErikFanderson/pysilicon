@@ -56,22 +56,24 @@ def vlog_mod_inst(name,inst,parameters,ports):
     rstr += vlog_mod_inst_ports(ports)
     return rstr
 
-def vlog_mod_inst_ports(ports):
+def vlog_mod_inst_ports(ports,tab=4*" "):
     ''' ports for instantiation '''
     rstr = ''
     for i,port in enumerate(ports):
-        rstr += f".{port['port']}({port['signal']})" 
+        rstr += f"{tab}.{port['port']}({port['signal']})" 
         if (len(ports)-1)==i:
             rstr += '\n);\n'
         else:
             rstr += ',\n'
     return rstr
 
-def vlog_mod_inst_params(inst,parameters):
+def vlog_mod_inst_params(inst,parameters,tab=4*' '):
     ''' parameters for instantiation '''
     rstr = f'{inst} (\n'
+    if parameters:
+        rstr = f'(\n'
     for i,p in enumerate(parameters):
-        rstr += f".{p['param']}({p['value']})" 
+        rstr += f"{tab}.{p['param']}({p['value']})" 
         if (len(parameters)-1)==i:
             rstr += f'\n) {inst} (\n'
         else:
@@ -83,8 +85,8 @@ def vlog_mod_begin(name,*ports):
     ports: list of {name:,io:,datatype:,vec:} 
     '''
     rstr = f'module {name}(\n'
-    for i,port in enumerate(ports):
-        rstr += vlog_port(port['name'],port['io'],port['datatype'],port['vec'],last=(len(ports)-1)==i)
+    for i,p in enumerate(ports):
+        rstr += vlog_port(p['name'],p['io'],p['datatype'],p['vec'],last=(len(ports)-1)==i)
     return rstr
 
 def vlog_port(name,io,datatype,vec=None,last=False,tab=4*' '):
@@ -99,6 +101,9 @@ def vlog_port(name,io,datatype,vec=None,last=False,tab=4*' '):
        rstr += ',\n'
     return rstr
 
+#----------------------------------------------------------
+# Scan generator class (uses argparse) 
+#----------------------------------------------------------
 class ScanGenerator:
     ''' Simple class for generating tex hw files '''
     def __init__(self):
@@ -192,8 +197,6 @@ class ScanGenerator:
         # Wire declarations for connecting sout to sin of segments
         fstr += begin_section("Signal declarations for connecting Sin and Sout of segments")
         for cell in self.config['cells']:
-            if cell['sin'] != 'SIn': 
-                fstr += f"wire {cell['sin']};\n" 
             if cell['sout'] != 'SOut': 
                 fstr += f"wire {cell['sout']};\n" 
         fstr += end_section()
