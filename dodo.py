@@ -6,6 +6,10 @@
 # 5. par => par.yml
 
 # TODO
+# 1. Add tasks for generating testbench and source files
+# 2. Add a section in filelist that allows for included dirs as well
+# 3. UVM integration?
+
 # 0. Only have the tasks be validated once!
 # 1. Replace current tests with simple ALU test
 # 2. Need to finish synthesis tcl stuff (sdc, write for innovus etc...)!
@@ -21,7 +25,7 @@
 # 13. pytest
 # 14. Need to make sure that SDC path in syn.yml is relative to working directory!
 
-from scripts.dodo_utility import *
+from pysilicon.dodo_utility import *
 
 #----------------------------------------------------------
 # DOIT Config 

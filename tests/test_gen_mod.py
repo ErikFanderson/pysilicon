@@ -1,5 +1,5 @@
 import os
-from scripts.dodo_utility import *
+from pysilicon.dodo_utility import *
 from subprocess import Popen
 import pathlib
 import pytest
