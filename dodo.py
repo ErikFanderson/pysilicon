@@ -7,7 +7,7 @@
 
 # TODO
 # 1. Add tasks for generating testbench and source files
-# 2. Add a section in filelist that allows for included dirs as well
+# 2. Split up filelist into inc_dirs and standalone files 
 # 3. UVM integration?
 
 # 0. Only have the tasks be validated once!
