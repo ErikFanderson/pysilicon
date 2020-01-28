@@ -141,6 +141,7 @@ class ScanGenerator:
                )
         fstr += end_section()
         # Write to file
+        fstr += default_nettype("wire") 
         fstr += 'endmodule\n'
         fstr += end_section() 
         fp.write(fstr)
