@@ -92,24 +92,60 @@ def vlog_mod_inst_params(inst,parameters,tab=4*' '):
             rstr += ',\n'
     return rstr
 
-def vlog_mod_begin(name,*ports):
+def vlog_mod_dec_params(parameters,tab=4*' '):
+    ''' For declaration. parameter is a dict with 'param' field and 'value' field '''
+    rstr = ''
+    for i,p in enumerate(parameters):
+        rstr += f"{tab}parameter {p['param']} = {p['value']}" 
+        if (len(parameters)-1)==i:
+            rstr += '\n) (\n'
+        else:
+            rstr += ',\n'
+    return rstr
+
+def vlog_mod_dec_ports(ports,tab=4*" "):
+    ''' ports for declaration '''
+    rstr = ''
+    for i,p in enumerate(ports):
+        if p["vec"] is not None:
+            rstr += f'{tab}{p["io"]} {p["datatype"]} {p["vec"]} {p["name"]}'
+        else:
+            rstr += f'{tab}{p["io"]} {p["datatype"]} {p["name"]}'
+        if (len(ports)-1)==i:
+            rstr += '\n);\n'
+        else:
+            rstr += ',\n'
+    return rstr
+
+def vlog_mod_dec(name,ports,parameters):
     ''' Writes beginning of verilog module
     ports: list of {name:,io:,datatype:,vec:} 
     '''
-    rstr = f'module {name}(\n'
-    for i,p in enumerate(ports):
-        rstr += vlog_port(p['name'],p['io'],p['datatype'],p['vec'],last=(len(ports)-1)==i)
+    rstr = f'module {name} (\n'
+    rstr += vlog_mod_dec_params(parameters)
+    rstr += vlog_mod_dec_ports(ports)
     return rstr
+    #rstr = f'module {name}'
+    ## Parameters
+    #if parameters:
+    #    for paramters
+    #    rstr += 
+    #else:
+    #    rstr += '(\n'
+    ## Ports
+    #for i,p in enumerate(ports):
+    #    rstr += vlog_port(p['name'],p['io'],p['datatype'],p['vec'],last=(len(ports)-1)==i)
+    #return rstr
 
-def vlog_port(name,io,datatype,vec=None,last=False,tab=4*' '):
-    rstr = ''
-    if vec:
-        rstr += f'{tab}{io} {datatype} {vec} {name}'
-    else:
-        rstr += f'{tab}{io} {datatype} {name}'
-    if last:
-        rstr += '\n);\n'
-    else:
-       rstr += ',\n'
-    return rstr
+#def vlog_mod_dec_ports(name,io,datatype,vec=None,last=False,tab=4*' '):
+#    #rstr = ''
+#    #if vec:
+#    #    rstr += f'{tab}{io} {datatype} {vec} {name}'
+#    #else:
+#    #    rstr += f'{tab}{io} {datatype} {name}'
+#    #if last:
+#    #    rstr += '\n);\n'
+#    #else:
+#    #   rstr += ',\n'
+#    #return rstr
 

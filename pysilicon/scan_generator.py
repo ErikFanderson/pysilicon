@@ -32,6 +32,11 @@ class ScanGenerator:
             required=True,
             help='Scan chain configuration file.'
         )
+        parser.add_argument(
+            '-rw', '--read-write',
+            action='store_true',
+            help='Generates final module with separate read and write io ports'
+        )
         return parser.parse_args()
 
     def evaluate_cells(self,config):
@@ -86,17 +91,25 @@ class ScanGenerator:
         fstr += yaml_comment(self.og_config,f'Scan chain "{self.config["name"]}" YAML configuration file')
         fstr += begin_section("Module declaration")
         fstr += default_nettype('none')
-        # Module Declaration
+        # Scan Bits Ports
         total_def = f'[`{self.config["prefix"]}_TotalLength-1:0]'
-        fstr += vlog_mod_begin(self.config['name'],
+        scan_bits_ports = [{'name': 'ScanBits','io': 'inout','datatype': 'wire','vec': total_def}]
+        if self.options.read_write:
+            scan_bits_ports = [{'name': 'ScanBitsRd','io': 'input','datatype': 'wire','vec': total_def},
+            {'name': 'ScanBitsWr','io': 'output','datatype': 'wire','vec': total_def}]
+        # Module Declaration
+        fstr += vlog_mod_dec(self.config['name'],ports=[
             {'name': 'SClkP','io': 'input','datatype': 'wire','vec': None},
             {'name': 'SClkN','io': 'input','datatype': 'wire','vec': None},
             {'name': 'SReset','io': 'input','datatype': 'wire','vec': None},
             {'name': 'SEnable','io': 'input','datatype': 'wire','vec': None},
             {'name': 'SUpdate','io': 'input','datatype': 'wire','vec': None},
             {'name': 'SIn','io': 'input','datatype': 'wire','vec': None},
-            {'name': 'SOut','io': 'output','datatype': 'wire','vec': None},
-            {'name': 'Cfg','io': 'inout','datatype': 'wire','vec': total_def}
+            {'name': 'SOut','io': 'output','datatype': 'wire','vec': None}]+scan_bits_ports,
+            parameters=[
+            {'param': 'TwoPhase','value': '1'},
+            {'param': 'ConfigLatch','value': '1'},
+            ]
         )
         fstr += '\n'
         # Wire declarations for connecting sout to sin of segments
@@ -107,6 +120,8 @@ class ScanGenerator:
         fstr += end_section()
         # Define and connect segments
         fstr += begin_section("Segment instantiation")
+        scan_bits_rd = 'ScanBitsRd' if self.options.read_write else 'ScanBits' 
+        scan_bits_wr = 'ScanBitsWr' if self.options.read_write else 'ScanBits' 
         for i,cell in enumerate(self.config['cells']):
             if cell['R/W'] == 'R':
                 fstr += vlog_mod_inst("ReadSegment",cell['full_name'],
@@ -114,12 +129,12 @@ class ScanGenerator:
                     {'port': 'SClkP','signal': 'SClkP'},
                     {'port': 'SClkN','signal': 'SClkN'},
                     {'port': 'SEnable','signal': 'SEnable'},
-                    {'port': 'CfgIn','signal': f'Cfg[`{cell["full_name"]}]'},
+                    {'port': 'CfgIn','signal': f'{scan_bits_rd}[`{cell["full_name"]}]'},
                     {'port': 'SIn','signal': cell['sin']},
                     {'port': 'SOut','signal': cell['sout']}],
                     parameters=[
                     {'param': 'PWidth','value': '`'+cell['full_name']+'_Width'},
-                    {'param': 'TwoPhase','value': '`'+self.config['prefix']+'_TwoPhase'}
+                    {'param': 'TwoPhase','value': 'TwoPhase'}
                     ]
                 )
             else:
@@ -130,13 +145,13 @@ class ScanGenerator:
                     {'port': 'SReset','signal': 'SReset'},
                     {'port': 'SEnable','signal': 'SEnable'},
                     {'port': 'SUpdate','signal': 'SUpdate'},
-                    {'port': 'CfgOut','signal': f'Cfg[`{cell["full_name"]}]'},
+                    {'port': 'CfgOut','signal': f'{scan_bits_wr}[`{cell["full_name"]}]'},
                     {'port': 'SIn','signal': cell['sin']},
                     {'port': 'SOut','signal': cell['sout']}],
                     parameters=[
                     {'param': 'PWidth','value': '`'+cell['full_name']+'_Width'},
-                    {'param': 'TwoPhase','value': '`'+self.config['prefix']+'_TwoPhase'},
-                    {'param': 'ConfigLatch','value': '`'+self.config['prefix']+'_ConfigLatch'}
+                    {'param': 'TwoPhase','value': 'TwoPhase'},
+                    {'param': 'ConfigLatch','value': 'ConfigLatch'}
                     ]
                )
         fstr += end_section()
@@ -152,17 +167,6 @@ class ScanGenerator:
         # YAML config 
         fstr += yaml_comment(self.og_config,
             f'Scan chain "{self.config["name"]}" YAML configuration file')
-        # Define the parameters
-        tp = 1 
-        if self.config['two_phase'] is False:
-            tp = 0 
-        cl = 1 
-        if self.config['config_latch'] is False:
-            cl = 0 
-        fstr += begin_section("Parameters") 
-        fstr += define(self.config['prefix']+'_TwoPhase',tp,tab='')
-        fstr += define(self.config['prefix']+'_ConfigLatch',tp,tab='')
-        fstr += end_section() 
         # defines total length 
         fstr += begin_section("Total scan chain length") 
         fstr += define(self.config['prefix']+'_TotalLength',self.full_width,tab='')

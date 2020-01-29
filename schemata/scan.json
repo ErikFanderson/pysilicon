@@ -3,8 +3,6 @@
 "properties": {
     "name": { "type": "string" },
     "prefix": { "type": "string" },
-    "config_latch": { "type": "boolean" },
-    "two_phase": { "type": "boolean" },
     "parameters": { "type": ["object","null"] },
     "cells": {
         "type": "array",
@@ -21,6 +19,6 @@
         "unique_items": true 
     }
 },
-"required": ["name","prefix","parameters","config_latch","two_phase","cells"],
+"required": ["name","prefix","parameters","cells"],
 "additionalProperties": false 
 }
