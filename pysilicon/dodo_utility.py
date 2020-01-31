@@ -258,6 +258,15 @@ class PySilicon:
         self.symlink_scratch(exp_dir)
         return exp_dir
 
+    def determine_valid_directory(self,prompt):
+        ''' Prompts for and returns a valid directory for creating files '''
+        rel_parent_path = input(prompt)
+        parent_path = Path(rel_parent_path).resolve()
+        while(not(parent_path.is_dir())):
+            rel_parent_path = input(f'"{parent_path}" is invalid path! {prompt}')
+            parent_path = Path(rel_parent_path).resolve()
+        return Path(rel_parent_path)
+
 #----------------------------------------------------------
 # Task Action Methods
 #----------------------------------------------------------
@@ -305,11 +314,8 @@ class PySilicon:
         ''' action portion of gen_module task '''
         # Get module and directory names
         module_name = input("Module name: ")
-        rel_parent_path = input("Path to module directory: ")
-        parent_path = Path(rel_parent_path).resolve()
-        while(not(parent_path.is_dir())):
-            rel_parent_path = input(f'"{parent_path}" is invalid path! Path to module directory: ')
-            parent_path = Path(rel_parent_path).resolve()
+        rel_parent_path = self.determine_valid_directory("Path to module directory: ")
+        parent_path = rel_parent_path.resolve()
         rel_mod_dir = Path(rel_parent_path) / module_name
         mod_dir = parent_path / module_name
         mod_dir.mkdir()
