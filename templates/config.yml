@@ -11,23 +11,23 @@ scratch_dir: /scratch/
 task_dirs:
   #- path/to/task/dir
 
-# RTL files for the standard cells 
-std_cell_rtl:
-  #- path/to/std_cells/std_cell_rtl.v 
+# Custom or misc lib files 
+misc_libs:
+  #- path/to/lib
 
-# Timing Libs
-libs_max: 
-  #- path/to/libs/max.lib 
-libs_min: 
-  #- path/to/libs/min.lib 
-libs_typ: 
-  #- path/to/libs/typ.lib 
+# Custom or misc lef files 
+misc_lefs:
+  #- path/to/lef
 
-# List of lefs (must specify LEFs to enable Physical Layout Estimation (PLE) synthesis flow)
-lefs:
-  #- path/to/lefs/file.lef 
-
-# Parasitics (qrc_tech_file takes precedence if both supplied)
-cap_table_file:
-qrc_tech_file:
+# List of all standard cells that can be used
+std_cells:
+  #- name: example_name
+  #  rtl: 
+  #    - path/to/rtl
+  #  libs_syn: 
+  #    - path/to/lib/for/synthesis
+  #  lefs:
+  #    - path/to/lef
+  #  cap_table_file: path/to/cap/table/file
+  #  qrc_tech_file: path/to/qrc/tech/file # Takes precedence over cap table if supplied
 {% endblock %}

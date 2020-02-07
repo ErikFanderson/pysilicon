@@ -1,48 +1,34 @@
 {
 "type": "object",
 "properties": {
-    "name": {
-        "type": "string"
-    },
-    "testbench": {
-        "type": "string"
-    },
-    "tcl_template": {
-        "type": ["string","null"]
-    },
+    "name": {"type": "string"},
+    "testbench": {"type": "string"},
+    "tcl_template": {"type": ["string","null"]},
     "filelist": {
         "type": "object",
         "properties": {
             "defines_src": {
                 "type": ["array","null"],
-                "items": {
-                    "type": "string"
-                },
-                "unique_items": true 
+                "items": {"type": "string"},
+                "uniqueItems": true 
             },
             "rtl_src": {
                 "type": ["array","null"],
-                "items": {
-                    "type": "string"
-                },
-                "unique_items": true 
+                "items": {"type": "string"},
+                "uniqueItems": true 
             },
             "test_src": {
                 "type": ["array","null"],
-                "items": {
-                    "type": "string"
-                },
-                "unique_items": true 
+                "items": {"type": "string"},
+                "uniqueItems": true 
             }
         },
         "required": ["defines_src","rtl_src","test_src"]
     },
     "sim_flags": {
         "type": ["array","null"],
-        "items": {
-            "type": "string"
-        },
-        "unique_items": true 
+        "items": {"type": "string"},
+        "uniqueItems": true 
     }
 },
 "required": ["name","testbench","tcl_template","filelist","sim_flags"],

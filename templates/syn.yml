@@ -20,8 +20,8 @@ filelist:
 syn_flags:
   - -batch
 
-# Timing libs to be used  (min, max, or typ)
-libs: 'max'
+# Name of standard cells that should be used
+std_cells: name_of_cells
 
 # Rel path to timing constraints file 
 sdc: {{mod_dir}}/timing.sdc 

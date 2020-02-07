@@ -16,7 +16,7 @@
           },
           "required": ["name","width","mult","R/W"]
         },
-        "unique_items": true 
+        "uniqueItems": true 
     }
 },
 "required": ["name","prefix","parameters","cells"],

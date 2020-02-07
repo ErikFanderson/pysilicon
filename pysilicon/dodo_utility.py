@@ -266,6 +266,23 @@ class PySilicon:
             rel_parent_path = input(f'"{parent_path}" is invalid path! {prompt}')
             parent_path = Path(rel_parent_path).resolve()
         return Path(rel_parent_path)
+    
+    def get_std_cells(self,name):
+        ''' loops everytime, but should never have a lot of std cells to loop thru... '''
+        for scs in self.config['std_cells']:
+            if name == scs['name']:
+                return scs
+        self.error_if_empty(None,f'Cannot find standard cells "{name}"')
+
+    def retrieve_std_cell_rtl(self,std_cell_names):
+        ''' Returns list of valid std cell rtl '''
+        if std_cell_names:
+            rtl = []
+            for c in std_cell_names:
+                rtl += self.get_std_cells(c)['rtl']
+            return self.check_and_resolve(rtl)
+        else:
+            return []
 
 #----------------------------------------------------------
 # Task Action Methods
@@ -279,7 +296,7 @@ class PySilicon:
         if sim_type != 'rtl':
             syn_fl = self.check_and_resolve(config['syn_par_filelist'])
             filelist += syn_fl 
-            filelist += self.check_and_resolve(self.config['std_cell_rtl'])
+            filelist += self.retrieve_std_cell_rtl(config['std_cells'])
             define_flags = self.return_define_flags(syn_fl) 
         flist_str = self.strip_and_cat(filelist)
         # Create scratch directory

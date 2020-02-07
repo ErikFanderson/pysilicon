@@ -3,24 +3,18 @@
 "properties": {
     "defines_src": {
         "type": ["array","null"],
-        "items": {
-            "type": "string"
-        },
-        "unique_items": true 
+        "items": {"type": "string"},
+        "uniqueItems": true 
     },
     "rtl_src": {
         "type": ["array","null"],
-        "items": {
-            "type": "string"
-        },
-        "unique_items": true 
+        "items": {"type": "string"},
+        "uniqueItems": true 
     },
     "test_src": {
         "type": ["array","null"],
-        "items": {
-            "type": "string"
-        },
-        "unique_items": true 
+        "items": {"type": "string"},
+        "uniqueItems": true 
     }
 },
 "required": ["defines_src","rtl_src","test_src"],

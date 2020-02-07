@@ -13,6 +13,11 @@ filelist:
   rtl_src:
   test_src:
 
+# Std_cells - For including std cell rtl
+std_cells:
+  #- name_of_std_cells0
+  #- name_of_std_cells1
+
 # Template for simulation tcl. Used for setting DB format and probe depth
 tcl_template:
 #tcl_template: {{rel_home}}/templates/sim_shm.tcl
