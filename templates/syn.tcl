@@ -12,8 +12,8 @@ set_db library {{"{"}}{{libs}}{{"}"}}
 # PLE - Simple Flow
 #-------------------------------------------------------------------------
 # 1. Load lef files
-set_db lef_library {{"{"}}{{lefs}}{{"}"}}
 set_db lef_stop_on_error true
+set_db lef_library {{"{"}}{{lefs}}{{"}"}}
 {%- if cap_table_file %}
 # 2a. Load cap table files
 set_db cap_table_file {{cap_table_file}}

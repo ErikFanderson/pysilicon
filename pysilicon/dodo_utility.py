@@ -217,6 +217,8 @@ class PySilicon:
     
     def gen_syn_tcl(self,template_path,exp_dir,config):
         ''' Generates syn.tcl from template '''
+        # Get std cells
+        sc = self.get_std_cells(config['std_cells'])
         # Create syn.tcl
         self.jinja_render(
             template_path=template_path,
@@ -224,10 +226,10 @@ class PySilicon:
             top_module=config['top'],
             hdl_files=config['hdl_files'],
             sdc_file=self.check_and_resolve_single(config['sdc']),
-            libs=self.check_and_cat(self.config['libs_'+config['libs']]),
-            lefs=self.check_and_cat(self.config['lefs']),
-            cap_table_file=self.check_and_resolve_single(self.config['cap_table_file']),
-            qrc_tech_file=self.check_and_resolve_single(self.config['qrc_tech_file'])
+            libs=self.check_and_cat(sc['libs_syn']),
+            lefs=self.check_and_cat(sc['lefs']),
+            cap_table_file=self.check_and_resolve_single(sc['cap_table_file']),
+            qrc_tech_file=self.check_and_resolve_single(sc['qrc_tech_file'])
         )
     
     def jinja_render(self,template_path,output_file_path,**kwargs):

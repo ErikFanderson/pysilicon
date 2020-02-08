@@ -6,6 +6,7 @@
     "tcl_template": {"type": "string"},
     "sdc": {"type": "string"},
     "std_cells": {"type": "string"},
+    "def": {"type": ["string","null"]},
     "filelist": {
         "type": "object",
         "properties": {

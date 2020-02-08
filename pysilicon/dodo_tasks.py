@@ -13,12 +13,10 @@
 # 0. Only have the tasks be validated once!
 # 1. Replace current tests with simple ALU test
 # 2. Need to finish synthesis tcl stuff (sdc, write for innovus etc...)!
-#       a. Need to verify that PLE works    
 #       b. need to write out to innovus
 #       c. PLE genus flow
 #           iii. DEF floorplan file (on a module-by-module basis?) - recommended!
 #       f. "define optimization settings" 
-#       f. Understand how multiple libraries work together... Why use max or min?
 # 5. Add in support for the experiments test flow
 # 8. Add place and route tasks
 # 12. README!
