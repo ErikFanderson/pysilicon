@@ -67,6 +67,9 @@ def localparam(name,value,tab=4*" "):
 def declaration(prefix,name,value,tab=4*" "):
     return f'{tab}{prefix} {name} = {value}\n'
 
+def set_var(name,value):
+    return f'{name} = {value};\n'
+
 def declare_signal_packed_1d(signal_type,name,length,tab=4*' '):
     if length > 1:
         return f'{tab}{signal_type} [{length-1}:0] {name};\n'
@@ -102,8 +105,13 @@ def define_clock(name,half_period,tab=4*' '):
 def display(msg):
     return f'$display("{msg}");\n'
 
-def vlog_assert(lhs,rhs,condition='=='):
-    return f'assert({lhs} {condition} {rhs});\n'
+def vlog_assert(lhs,rhs,msg='',condition='==',tab=4*' '):
+    rstr = f'if ({lhs} {condition} {rhs}) begin\n'
+    rstr += tab+display(f"[PASSED] {msg}")
+    rstr += 'end else begin\n'
+    rstr += tab+display(f"[FAILED] {msg}")
+    rstr += 'end\n'
+    return rstr 
 
 def wait(value):
     return f"#({value});\n"
@@ -216,27 +224,71 @@ def add_tabs(string,tab=4*' '):
     string_list[0] = tab + string_list[0]
     return tab.join(string_list) 
 
-def vlog_task(name,ports,func=lambda: '',tab=4*' '):
+def vlog_task(name,ports,variables,func=lambda: '',tab=4*' '):
     ''' Writes beginning of verilog module
     :param name name of task
     :param ports list of {name:,io:,datatype:,vec:} 
+    :param variables list of {name:,datatype:,length} 
     :param func function to fill out internal (returns str)
     '''
     rstr = begin_section(f"Task Declaration: {name} ")
     # Declare ports
-    rstr += f'task {name} (\n' if ports else f'task {name} ();\nbegin\n'
+    rstr += f'task {name} (\n' if ports else f'task {name} ();\n'
     for i,p in enumerate(ports):
-        if p["vec"] is not None:
-            rstr += f'{tab}{p["io"]} {p["datatype"]} {p["vec"]} {p["name"]}'
-        else:
-            rstr += f'{tab}{p["io"]} {p["datatype"]} {p["name"]}'
+        rstr += tab + f'{p["io"]} {p["datatype"]} {p["vec"]} {p["name"]}'.replace('  ',' ')
         if (len(ports)-1)==i:
-            rstr += '\n);\nbegin\n'
+            rstr += '\n);\n'
         else:
             rstr += ',\n'
+    # Declare variables
+    for v in variables:
+        rstr += declare_signal_packed_1d(v['datatype'],v['name'],v['length'],tab)
+    rstr += "begin\n"
     rstr += add_tabs(func(),tab)
     rstr += "end\nendtask\n"
     rstr += end_section()
+    return rstr
+
+def two_phase_scan_task(name,s_clk_p,s_in,s_out,s_en,s_update,scan_cycle):
+    """ Two phase scan task """
+    def scan_func():   
+        return f"""// Enable scan
+@(posedge {s_clk_p});
+{s_en} = 1'b1;
+
+// MSB bits are scanned in first            
+for (i = 0; i < length; i = i + 1) begin
+    j = length-1-i;
+    // Scan In
+    {s_in} = scan_in_data[j]; // Scan In
+    // Scan Out
+    scan_out_data[j] = {s_out}; // Scan Out
+    #({scan_cycle});
+end
+
+// Disable scan 
+{s_en} = 1'b0;
+
+// Update
+#({scan_cycle});
+{s_update} = 1'b1;
+#({scan_cycle});
+{s_update} = 1'b0;
+#({scan_cycle});
+"""
+    rstr = vlog_task(
+        name=name,
+        ports=[
+            {"name": "scan_in_data", "io": "input", "datatype": '', "vec": f"[99999:0]"},
+            {"name": "scan_out_data", "io": "output", "datatype": "reg", "vec": f"[99999:0]"},
+            {"name": "length", "io": "input", "datatype": "integer","vec":''},
+        ],
+        variables=[
+            {"name": "i", "datatype": "integer", "length": 1},
+            {"name": "j", "datatype": "integer", "length": 1}
+        ],
+        func=scan_func
+    )
     return rstr
 
 def vlog_file(name,ports,parameters,func,time_unit='1ns',time_precision='1ps',config=None):
