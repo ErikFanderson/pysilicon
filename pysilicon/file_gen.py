@@ -67,11 +67,31 @@ def localparam(name,value,tab=4*" "):
 def declaration(prefix,name,value,tab=4*" "):
     return f'{tab}{prefix} {name} = {value}\n'
 
-def declare_signal(signal_type,name,length,tab=4*' '):
+def declare_signal_packed_1d(signal_type,name,length,tab=4*' '):
     if length > 1:
         return f'{tab}{signal_type} [{length-1}:0] {name};\n'
     else:
         return f'{tab}{signal_type} {name};\n'
+
+def declare_signal_2d(signal_type,name,packed_length,unpacked_length,tab=''):
+    """ Declares a 2d unpacked array """
+    return f'{tab}{signal_type} [{packed_length-1}:0] {name} [{unpacked_length-1}:0];\n'
+
+def wire(name,length=1,tab=''):
+    """ Wire supports simple packed array """
+    return declare_signal_packed_1d('wire',name,length,tab)
+
+def reg(name,length=1,tab=''):
+    """ Reg supports simple packed array """
+    return declare_signal_packed_1d('reg',name,length,tab)
+
+def wire_2d(name,packed_length,unpacked_length,tab=''):
+    """ Wire supports simple packed array """
+    return declare_signal_2d('wire',name,packed_length,unpacked_length,tab)
+
+def reg_2d(name,packed_length,unpacked_length,tab=''):
+    """ Wire supports simple packed array """
+    return declare_signal_2d('reg',name,packed_length,unpacked_length,tab)
 
 def define_clock(name,half_period,tab=4*' '):
     """ Defines a clock """
@@ -79,22 +99,21 @@ def define_clock(name,half_period,tab=4*' '):
         return f"{tab}{name} = 0;\n{tab}forever #({half_period}) {name} = !{name};\n"
     return initial_statement(clock)
 
-def wire(name,length=1,tab=''):
-    """ Wire supports simple packed array """
-    return declare_signal('wire',name,length,tab)
-
-def reg(name,length=1,tab=''):
-    """ Reg supports simple packed array """
-    return declare_signal('reg',name,length,tab)
-
 def display(msg):
     return f'$display("{msg}");\n'
 
 def vlog_assert(lhs,rhs,condition='=='):
     return f'assert({lhs} {condition} {rhs});\n'
 
-def delay(value):
+def wait(value):
     return f"#({value});\n"
+
+def reset_init(name,delay=10,start=0,end=1):
+    """ Initializes reset """
+    rstr = f"{name} = 1'b{start};\n"
+    rstr += wait(delay) 
+    rstr += f"{name} = 1'b{end};\n"
+    return rstr
 
 def dump_all(dumpfile):
     return "$dumpfile({dumpfile});\n$dumpvars();\n"
@@ -189,6 +208,35 @@ def vlog_mod_dec(name,ports,parameters):
     rstr = f'module {name} '
     rstr += vlog_mod_dec_params(parameters)
     rstr += vlog_mod_dec_ports(ports)
+    return rstr
+
+def add_tabs(string,tab=4*' '):
+    """ Adds tabs to every new line """
+    string_list = [s+'\n' for s in string.splitlines()]
+    string_list[0] = tab + string_list[0]
+    return tab.join(string_list) 
+
+def vlog_task(name,ports,func=lambda: '',tab=4*' '):
+    ''' Writes beginning of verilog module
+    :param name name of task
+    :param ports list of {name:,io:,datatype:,vec:} 
+    :param func function to fill out internal (returns str)
+    '''
+    rstr = begin_section(f"Task Declaration: {name} ")
+    # Declare ports
+    rstr += f'task {name} (\n' if ports else f'task {name} ();\nbegin\n'
+    for i,p in enumerate(ports):
+        if p["vec"] is not None:
+            rstr += f'{tab}{p["io"]} {p["datatype"]} {p["vec"]} {p["name"]}'
+        else:
+            rstr += f'{tab}{p["io"]} {p["datatype"]} {p["name"]}'
+        if (len(ports)-1)==i:
+            rstr += '\n);\nbegin\n'
+        else:
+            rstr += ',\n'
+    rstr += add_tabs(func(),tab)
+    rstr += "end\nendtask\n"
+    rstr += end_section()
     return rstr
 
 def vlog_file(name,ports,parameters,func,time_unit='1ns',time_precision='1ps',config=None):
