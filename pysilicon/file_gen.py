@@ -98,24 +98,35 @@ def reg_2d(name,packed_length,unpacked_length,tab=''):
 
 def define_clock(name,half_period,clk_en=None,tab=4*' '):
     """ Defines a clock """
-    def clock():
-        if clk_en is not None:
-            return f"{tab}{name} = 0;\n{tab}forever #({half_period}) {name} = {clk_en} ^ {name};\n"
-        else:
-            return f"{tab}{name} = 0;\n{tab}forever #({half_period}) {name} = !{name};\n"
-
-    return initial_statement(clock)
+    rstr = ''
+    if clk_en is not None:
+        rstr = f"{tab}{name} = 0;\n{tab}forever #({half_period}) {name} = {clk_en} ^ {name};\n"
+    else:
+        rstr = f"{tab}{name} = 0;\n{tab}forever #({half_period}) {name} = !{name};\n"
+    return initial_statement(rstr)
 
 def display(msg):
     return f'$display("{msg}");\n'
 
-def vlog_assert(lhs,rhs,msg='',condition='==',tab=4*' '):
+def vlog_assert(lhs,rhs,pass_variable,msg='',condition='==',tab=4*' '):
+    """ Custom assertion """
     rstr = f'if ({lhs} {condition} {rhs}) begin\n'
     rstr += tab+display(f"[PASSED] {msg}")
     rstr += 'end else begin\n'
     rstr += tab+display(f"[FAILED] {msg}")
+    rstr += tab+set_var(pass_variable,"1'b0")
     rstr += 'end\n'
     return rstr 
+
+def check_pass_variable(pass_variable,tab=4*' '):
+    rstr = display(30*"#")
+    rstr += f"if ({pass_variable} !== 1'b1) begin\n"
+    rstr += tab+display("# FAILED")
+    rstr += f"end else begin\n"
+    rstr += tab+display("# PASSED")
+    rstr += f"end\n"
+    rstr += display(30*"#")
+    return rstr
 
 def wait(value):
     return f"#({value});\n"
@@ -133,22 +144,22 @@ def dump_all(dumpfile):
 def dump_vpd():
     return "$vcdpluson();\n"
 
-def wrap_statement(begin: str,end: str,func):
+def wrap_statement(begin: str,end: str,internals):
     """ 
     Calls func and wraps begin and end around it
     :param func function that is called (should return str)
     """
     fstr = begin
-    fstr += func()
+    fstr += internals 
     fstr += end 
     return fstr
 
-def initial_statement(func):
+def initial_statement(internals):
     """ 
     Calls func and wraps intial begin end around it
     :param func function that is called (should return str)
     """
-    return wrap_statement("initial begin \n","end\n",func)
+    return wrap_statement("initial begin \n","end\n",internals)
 
 def vlog_mod_inst(name,inst,parameters,ports):
     ''' 
@@ -253,7 +264,7 @@ def vlog_task(name,ports,variables,func=lambda: '',tab=4*' '):
     rstr += end_section()
     return rstr
 
-def two_phase_scan_task(name,clk_en,s_clk_p,s_in,s_out,s_en,s_update,scan_cycle):
+def two_phase_scan_task(name,clk_en,s_in,s_out,s_en,s_update,scan_cycle):
     """ Two phase scan task """
     def scan_func():   
         return f"""// Enable scan
@@ -297,7 +308,7 @@ end
     )
     return rstr
 
-def vlog_file(name,ports,parameters,func,time_unit='1ns',time_precision='1ps',config=None):
+def vlog_file(name,ports,parameters,internals,time_unit='1ns',time_precision='1ps',config=None):
     """ 
     Full verilog module declaration
     :param ports list of {name:,io:,datatype:,vec:} 
@@ -312,7 +323,7 @@ def vlog_file(name,ports,parameters,func,time_unit='1ns',time_precision='1ps',co
     rstr += default_nettype("none")
     rstr += timescale(time_unit,time_precision)
     rstr += vlog_mod_dec(name,ports,parameters)
-    rstr += func()
+    rstr += internals 
     rstr += 'endmodule;\n'
     rstr += default_nettype("wire")
     rstr += end_section()
