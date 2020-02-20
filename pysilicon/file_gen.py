@@ -96,10 +96,14 @@ def reg_2d(name,packed_length,unpacked_length,tab=''):
     """ Wire supports simple packed array """
     return declare_signal_2d('reg',name,packed_length,unpacked_length,tab)
 
-def define_clock(name,half_period,tab=4*' '):
+def define_clock(name,half_period,clk_en=None,tab=4*' '):
     """ Defines a clock """
     def clock():
-        return f"{tab}{name} = 0;\n{tab}forever #({half_period}) {name} = !{name};\n"
+        if clk_en is not None:
+            return f"{tab}{name} = 0;\n{tab}forever #({half_period}) {name} = {clk_en} ^ {name};\n"
+        else:
+            return f"{tab}{name} = 0;\n{tab}forever #({half_period}) {name} = !{name};\n"
+
     return initial_statement(clock)
 
 def display(msg):
@@ -249,11 +253,11 @@ def vlog_task(name,ports,variables,func=lambda: '',tab=4*' '):
     rstr += end_section()
     return rstr
 
-def two_phase_scan_task(name,s_clk_p,s_in,s_out,s_en,s_update,scan_cycle):
+def two_phase_scan_task(name,clk_en,s_clk_p,s_in,s_out,s_en,s_update,scan_cycle):
     """ Two phase scan task """
     def scan_func():   
         return f"""// Enable scan
-@(posedge {s_clk_p});
+{clk_en} = 1'b1;
 {s_en} = 1'b1;
 
 // MSB bits are scanned in first            
@@ -267,6 +271,8 @@ for (i = 0; i < length; i = i + 1) begin
 end
 
 // Disable scan 
+#({scan_cycle});
+{clk_en} = 1'b0;
 {s_en} = 1'b0;
 
 // Update
@@ -279,8 +285,8 @@ end
     rstr = vlog_task(
         name=name,
         ports=[
-            {"name": "scan_in_data", "io": "input", "datatype": '', "vec": f"[99999:0]"},
-            {"name": "scan_out_data", "io": "output", "datatype": "reg", "vec": f"[99999:0]"},
+            {"name": "scan_in_data", "io": "input", "datatype": '', "vec": f"[4095:0]"},
+            {"name": "scan_out_data", "io": "output", "datatype": "reg", "vec": f"[4095:0]"},
             {"name": "length", "io": "input", "datatype": "integer","vec":''},
         ],
         variables=[
