@@ -1,0 +1,10 @@
+1. Create global dictionary/namespace. All jinja files need to be passed global namespace variables!
+2. Job consists of
+    a. Class w/ main function that returns a list w/ (name,func). These define the sub-steps similar to hammer
+    b. files directory (can contain anything. Schemata, templates, etc...)
+    c. parameters.yml (lists the required parameters, optional parameters labeled explicitly as optional)
+3. Add placeholder tests for every utility function. In fact, create a utility package in pysilicon folder
+4. Create a bin folder to contain things like scan_generator, etc...
+5. Transition pysilicon to a command line argument similar to hammer...
+6. Need to rename pysilicon... This is a more general project than hammer
+7. Bootstrap w/ Make but add doit and other build systems as Jobs 
