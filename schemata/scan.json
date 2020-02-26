@@ -2,7 +2,6 @@
 "type": "object",
 "properties": {
     "name": { "type": "string" },
-    "prefix": { "type": "string" },
     "parameters": { "type": ["object","null"] },
     "cells": {
         "type": "array",
@@ -19,6 +18,6 @@
         "uniqueItems": true 
     }
 },
-"required": ["name","prefix","parameters","cells"],
+"required": ["name","parameters","cells"],
 "additionalProperties": false 
 }

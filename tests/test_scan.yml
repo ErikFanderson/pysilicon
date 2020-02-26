@@ -1,5 +1,4 @@
 name: test_scan_chain 
-prefix: TSC 
 parameters:
   x: 6
   y: 7

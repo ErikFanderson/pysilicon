@@ -239,7 +239,7 @@ def add_tabs(string,tab=4*' '):
     string_list[0] = tab + string_list[0]
     return tab.join(string_list) 
 
-def vlog_task(name,ports,variables,func=lambda: '',tab=4*' '):
+def vlog_task(name,ports,variables,internals='',tab=4*' '):
     ''' Writes beginning of verilog module
     :param name name of task
     :param ports list of {name:,io:,datatype:,vec:} 
@@ -259,15 +259,14 @@ def vlog_task(name,ports,variables,func=lambda: '',tab=4*' '):
     for v in variables:
         rstr += declare_signal_packed_1d(v['datatype'],v['name'],v['length'],tab)
     rstr += "begin\n"
-    rstr += add_tabs(func(),tab)
+    rstr += add_tabs(internals,tab)
     rstr += "end\nendtask\n"
     rstr += end_section()
     return rstr
 
 def two_phase_scan_task(name,clk_en,s_in,s_out,s_en,s_update,scan_cycle):
     """ Two phase scan task """
-    def scan_func():   
-        return f"""// Enable scan
+    scan_str="""// Enable scan
 {clk_en} = 1'b1;
 {s_en} = 1'b1;
 
@@ -304,7 +303,7 @@ end
             {"name": "i", "datatype": "integer", "length": 1},
             {"name": "j", "datatype": "integer", "length": 1}
         ],
-        func=scan_func
+        internals=scan_str
     )
     return rstr
 
