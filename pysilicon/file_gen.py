@@ -323,7 +323,7 @@ def vlog_file(name,ports,parameters,internals,time_unit='1ns',time_precision='1p
     rstr += timescale(time_unit,time_precision)
     rstr += vlog_mod_dec(name,ports,parameters)
     rstr += internals 
-    rstr += 'endmodule;\n'
+    rstr += 'endmodule\n'
     rstr += default_nettype("wire")
     rstr += end_section()
     return rstr
