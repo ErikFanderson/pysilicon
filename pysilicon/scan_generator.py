@@ -24,6 +24,7 @@ class ScanGenerator:
         # Argparse check
         self.options = self.parse_args()
         if Path(self.options.config).is_file() is False:
+            print(f'"{self.options.config}" is invalid or does not exist!')
             sys.exit(-1)
         self.gen_chain()
     
@@ -260,7 +261,9 @@ class ScanGenerator:
             ports=[
                 {'port': 'SClkP','signal': 'SClkP'},
                 {'port': 'SClkN','signal': 'SClkN'},
+                {'port': 'SReset','signal': 'SReset'},
                 {'port': 'SEnable','signal': 'SEnable'},
+                {'port': 'SUpdate','signal': 'SUpdate'},
                 {'port': 'SIn','signal': 'SIn'},
                 {'port': 'SOut','signal': 'SOut'}]+scan_ports,
             parameters=[
