@@ -113,10 +113,16 @@ class ScanGenerator:
                     print(f'File "{self.config["name"]}_defines.v" generated successfully.')
             # Generate optional files
             if self.options.bypass:
-                rstr = self.gen_bypass()
+                # Core
+                rstr = self.gen_bypass_core()
+                with open(self.config['name']+'_bypass_core.v','w') as bfp:
+                    bfp.write(rstr)
+                print(f'File "{self.config["name"]}_bypass_core.v" generated successfully.')
+                # Wrapper
+                rstr = self.gen_bypass_wrapper()
                 with open(self.config['name']+'_bypass.v','w') as bfp:
                     bfp.write(rstr)
-                print(f'File "{self.config["name"]}_bypasss.v" generated successfully.')
+                print(f'File "{self.config["name"]}_bypass.v" generated successfully.')
 
     def gen_src(self,sfp,dfp):
         ''' generates the verilog source '''
@@ -241,13 +247,57 @@ class ScanGenerator:
         fstr += end_section()
         fp.write(fstr)
 
-    def gen_bypass(self):
-        """Generates bypass vlog file"""
+    def gen_bypass_wrapper(self):
+        """Wrapper around core file that can be used for custom task generation"""
+        # Instantiate core
+        scan_ports = [
+            {'port': 'ScanBitsRd','signal': 'ScanBitsRd'},
+            {'port': 'ScanBitsWr','signal': 'ScanBitsWr'}
+        ] if self.options.read_write else [
+            {'port': 'ScanBits','signal': 'ScanBits'}
+        ]
+        internals = vlog_mod_inst(f"{self.config['name']}_bypass_core",'core',
+            ports=[
+                {'port': 'SClkP','signal': 'SClkP'},
+                {'port': 'SClkN','signal': 'SClkN'},
+                {'port': 'SEnable','signal': 'SEnable'},
+                {'port': 'SIn','signal': 'SIn'},
+                {'port': 'SOut','signal': 'SOut'}]+scan_ports,
+            parameters=[
+                {'param': 'TwoPhase','value': '1'},
+                {'param': 'ConfigLatch','value': '1'},
+            ]
+        )
+        # Blank Space for Custom Tasks
+        internals += begin_section("Custom Tasks")
+        internals += end_section()
+        # Return Wrapper
+        return vlog_file(
+            name=self.config['name'],
+            ports=[
+                {'name': 'SClkP','io': 'input','datatype': 'wire','vec': None},
+                {'name': 'SClkN','io': 'input','datatype': 'wire','vec': None},
+                {'name': 'SReset','io': 'input','datatype': 'wire','vec': None},
+                {'name': 'SEnable','io': 'input','datatype': 'wire','vec': None},
+                {'name': 'SUpdate','io': 'input','datatype': 'wire','vec': None},
+                {'name': 'SIn','io': 'input','datatype': 'wire','vec': None},
+                {'name': 'SOut','io': 'output','datatype': 'wire','vec': None}]+
+                self.config['scan_bits_ports'],
+            parameters=[
+                {'param': 'TwoPhase','value': '1'},
+                {'param': 'ConfigLatch','value': '1'},
+            ],
+            internals=internals,
+            config=self.og_config
+        )
+
+    def gen_bypass_core(self):
+        """Generates bypass core vlog file"""
         scan_bits_ports = copy.deepcopy(self.config['scan_bits_ports'])
         if self.options.read_write:
             scan_bits_ports[1]['datatype'] = "reg"
         return vlog_file(
-            name=self.config['name'],
+            name=self.config['name']+"_bypass_core",
             ports=[
                 {'name': 'SClkP','io': 'input','datatype': 'wire','vec': None},
                 {'name': 'SClkN','io': 'input','datatype': 'wire','vec': None},
